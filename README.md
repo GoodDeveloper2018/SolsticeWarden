@@ -1,2 +1,2 @@
 # SolsticeWarden
-A weather managing game where you are a powerful Wizard
+A weather managing game as a powerful Wizard

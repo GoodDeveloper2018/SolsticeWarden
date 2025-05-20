@@ -11,5 +11,5 @@ public abstract class GameObject {
     }
 
     public abstract void render(Graphics g);
-    public abstract void update(); // Optional if you add animation
+    public abstract void update(); //added for potential animation
 }

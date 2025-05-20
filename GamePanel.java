@@ -3,48 +3,62 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-public class GamePanel extends JPanel implements MouseListener, KeyListener {
+public class GamePanel extends JPanel implements MouseListener {
 
     public static final int WIDTH = 800;
     public static final int HEIGHT = 800;
+    private final int GRID_SIZE = 5;
 
-    private ArrayList<GameObject> gameObjects;
+    private ArrayList<Region> regions;
+    private SeasonManager seasonManager;
 
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Color.BLACK);
-
         addMouseListener(this);
-        addKeyListener(this);
         setFocusable(true);
-        requestFocusInWindow();
 
-        gameObjects = new ArrayList<>();
+        regions = new ArrayList<>();
+        seasonManager = new SeasonManager();
+
         initGame();
     }
 
     private void initGame() {
-        // Example: Add one region just to test
-        gameObjects.add(new Region(100, 100, 100, 100, "Forest"));
+        int cellSize = WIDTH / GRID_SIZE;
+        for (int row = 0; row < GRID_SIZE; row++) {
+            for (int col = 0; col < GRID_SIZE; col++) {
+                regions.add(new Region(col * cellSize, row * cellSize, cellSize, cellSize, "Region " + row + "," + col));
+            }
+        }
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        for (Region r : regions) {
+            r.render(g);
+        }
 
-        for (GameObject obj : gameObjects) {
-            obj.render(g);
+        g.setColor(Color.WHITE);
+        g.drawString("Season: " + seasonManager.getCurrentSeason() + " | Turn: " + seasonManager.getTurn(), 10, 20);
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        for (Region r : regions) {
+            if (r.containsPoint(e.getX(), e.getY())) {
+                r.growForest(seasonManager);
+                seasonManager.nextTurn();
+                repaint();
+                break;
+            }
         }
     }
 
-    // Input handlers
-    @Override public void mouseClicked(MouseEvent e) {}
+    // Unused MouseListener methods
     @Override public void mousePressed(MouseEvent e) {}
     @Override public void mouseReleased(MouseEvent e) {}
     @Override public void mouseEntered(MouseEvent e) {}
     @Override public void mouseExited(MouseEvent e) {}
-
-    @Override public void keyTyped(KeyEvent e) {}
-    @Override public void keyPressed(KeyEvent e) {}
-    @Override public void keyReleased(KeyEvent e) {}
 }

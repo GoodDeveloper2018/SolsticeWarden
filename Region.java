@@ -21,7 +21,6 @@ public class Region extends GameObject {
 
         natureLevel += growth;
         if (natureLevel > 100) natureLevel = 100;
-
         System.out.println("Grew forest in " + type + " for +" + growth + " nature (now: " + natureLevel + ")");
     }
 

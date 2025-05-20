@@ -1,6 +1,11 @@
 public class SeasonManager {
     private Season currentSeason;
     private int turn;
+    private int temperature;
+    private int humidity;
+    private int wind;
+    private boolean percipitation;
+    private int percipitationLevel;
 
     public SeasonManager() {
         currentSeason = Season.SPRING;
@@ -24,10 +29,12 @@ public class SeasonManager {
     }
 
     public int getNatureGrowthModifier() {
+        Season caseValue = currentSeason;
         return switch (currentSeason) {
             case SPRING -> 2;
             case AUTUMN -> 1;
             case SUMMER, WINTER -> 0;
+
         };
     }
 

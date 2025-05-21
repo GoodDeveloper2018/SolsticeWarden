@@ -1,7 +1,6 @@
 import java.awt.*;
 
 public class Region extends GameObject {
-
     private String type;
     private int natureLevel;
     private int civLevel;
@@ -18,7 +17,6 @@ public class Region extends GameObject {
         int modifier = sm.getNatureGrowthModifier();
         int resistance = civLevel;
         int growth = (base * modifier) - (resistance / 5);
-
         natureLevel += growth;
         if (natureLevel > 100) natureLevel = 100;
         System.out.println("Grew forest in " + type + " for +" + growth + " nature (now: " + natureLevel + ")");

@@ -2,10 +2,10 @@ public class SeasonManager {
     private Season currentSeason;
     private int turn;
     private int temperature;
-    private int humidity;
-    private int wind;
+    private int relativeHumidity;
+    private int windSpeed;
     private boolean percipitation;
-    private int percipitationLevel;
+    private int percipitationIntensity;
 
     public SeasonManager() {
         currentSeason = Season.SPRING;
@@ -28,13 +28,28 @@ public class SeasonManager {
         return currentSeason;
     }
 
+    public int setNatureGrowthModifier(Season season) {
+        int growthModifier = 0;
+        if (getCurrentSeason() == Season.SPRING || getCurrentSeason() == Season.AUTUMN) {
+            temperature = (int)(Math.random() * 20) + 30;
+        }
+        else if (getCurrentSeason() == Season.SUMMER) {
+            temperature = (int)(Math.random() * 20) + 65;
+        }
+        else {
+            temperature = (int)(Math.random() * 20) + 20;
+        }
+        if(50 < temperature && temperature >= 70) return growthModifier+=2;
+        return growthModifier+=1;
+    }
+
     public int getNatureGrowthModifier() {
         Season caseValue = currentSeason;
         return switch (currentSeason) {
-            case SPRING -> 2;
-            case AUTUMN -> 1;
-            case SUMMER, WINTER -> 0;
-
+            case SPRING -> setNatureGrowthModifier(Season.SPRING);
+            case AUTUMN -> setNatureGrowthModifier(Season.AUTUMN);
+            case SUMMER -> setNatureGrowthModifier(Season.SUMMER);
+            case WINTER -> setNatureGrowthModifier(Season.WINTER);
         };
     }
 

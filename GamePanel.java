@@ -21,6 +21,7 @@ public class GamePanel extends JPanel implements MouseListener {
         regions = new ArrayList<>();
         seasonManager = new SeasonManager();
 
+
         initGame();
     }
 
@@ -39,7 +40,6 @@ public class GamePanel extends JPanel implements MouseListener {
         for (Region r : regions) {
             r.render(g);
         }
-
         g.setColor(Color.WHITE);
         g.drawString("Season: " + seasonManager.getCurrentSeason() + " | Turn: " + seasonManager.getTurn(), 10, 20);
     }

@@ -1,15 +1,36 @@
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Region extends GameObject {
     private String type;
     private int natureLevel;
     private int civLevel;
+    private int villagerAppreciation;
 
     public Region(int x, int y, int width, int height, String type) {
         super(x, y, width, height);
         this.type = type;
         this.natureLevel = 50;
         this.civLevel = 20;
+    }
+
+    public void villagerInteraction(int civLevel, int natureLevel) {
+        //DETERMINANT FACTOR OF FREQUENCY TO CONTROL WEATHER (ACTIONS) ALSO NEED TO CREATE PHYSICAL BAR IN GUI LIKE PLAYER HEALTH BUT FOR VILLAGER HAPPINESS
+        String[] villagerSubConcentration = {"PERFECT", "GOOD", "DECENT", "BAD", "TERRIBLE"};
+        Map<Region, String> villagerInteractions = new HashMap<>();
+        villagerInteractions.put(Season.SUMMER, "Thank you my Lord and Savior");
+        villagerInteractions.put(Season.AUTUMN, "Growing season, Thanks IG");
+        villagerInteractions.put(Season.SPRING, "SUCH A PROSPEROUS ERA I LOVE YOU");
+        villagerInteractions.put(Season.WINTER, "AH HELL  TS TRASH");
+        int cohesiveWeather = civLevel.applyWeather();
+        this.type = civLevel.getInstance(cohesiveWeather);
+        if (villagerInteractions.get()) {
+            villagerAppreciation += civLevel;
+        }
+        else {
+            villagerAppreciation =- civLevel;
+        }
     }
 
     public void applyWeather(SeasonManager sm) {
@@ -32,7 +53,6 @@ public class Region extends GameObject {
             civLevel += 2; // natural growth
         }
 
-        // Clamp values
         natureLevel = Math.max(0, Math.min(100, natureLevel));
         civLevel = Math.max(0, Math.min(100, civLevel));
     }

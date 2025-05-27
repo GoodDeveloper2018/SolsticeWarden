@@ -48,7 +48,7 @@ public class GamePanel extends JPanel implements MouseListener {
     public void mouseClicked(MouseEvent e) {
         for (Region r : regions) {
             if (r.containsPoint(e.getX(), e.getY())) {
-                r.growForest(seasonManager);
+                r.applyWeather(seasonManager);
                 seasonManager.nextTurn();
                 repaint();
                 break;

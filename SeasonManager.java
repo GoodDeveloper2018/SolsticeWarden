@@ -59,10 +59,20 @@ public class SeasonManager {
         }
     }
 
-    public Season getCurrentSeason() { return currentSeason; }
-    public int getTurn() {
-        return turn;
+    public void forcePrecipitation(boolean status) {
+        precipitation = status;
     }
+
+    public void increaseTemperature() {
+        temperature += 10;
+    }
+
+    public void increaseWind() {
+        windSpeed += 10;
+    }
+
+    public Season getCurrentSeason() { return currentSeason; }
+    public int getTurn() { return turn; }
 
     public int getTemperature() { return temperature; }
     public int getHumidity() { return humidity; }

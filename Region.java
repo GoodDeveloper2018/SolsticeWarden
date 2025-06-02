@@ -4,14 +4,13 @@ public class Region extends GameObject {
     private String type;
     private int natureLevel;
     private int civLevel;
-    private int villagerAppreciation;
+    private boolean coldSeason;
 
     public Region(int x, int y, int width, int height, String type) {
         super(x, y, width, height);
         this.type = type;
         this.natureLevel = 50;
         this.civLevel = 20;
-        this.villagerAppreciation = 50;
     }
 
     public void applyWeather(SeasonManager sm) {
@@ -36,25 +35,6 @@ public class Region extends GameObject {
         civLevel = Math.max(0, Math.min(100, civLevel));
     }
 
-    public boolean villagerReaction(SeasonManager sm) {
-        boolean helped = false;
-        int temp = sm.getTemperature();
-        int humidity = sm.getHumidity();
-        boolean rain = sm.isPrecipitation();
-
-        if (rain && humidity > 60 && temp < 80) {
-            villagerAppreciation += 5;
-            helped = true;
-        } else if (temp > 90 || humidity < 30) {
-            villagerAppreciation -= 5;
-        } else {
-            villagerAppreciation += 1;
-        }
-
-        villagerAppreciation = Math.max(0, Math.min(100, villagerAppreciation));
-        return helped;
-    }
-
     @Override
     public void render(Graphics g) {
         int green = Math.min(255, natureLevel * 2);
@@ -68,7 +48,7 @@ public class Region extends GameObject {
 
     @Override
     public void update() {
-        // Future animation logic
+
     }
 
     public boolean containsPoint(int mx, int my) {

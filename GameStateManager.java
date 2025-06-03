@@ -10,7 +10,7 @@ public class GameStateManager {
             villagers.add(new Village());
         }
     }
-
+    /*
     public void updateVillagers(ArrayList<Region> regions) {
         for (Village v : villagers) {
             if (v.isAlive()) {
@@ -24,6 +24,11 @@ public class GameStateManager {
         return regions.stream()
                 .max(Comparator.comparingInt(r -> r.getNatureLevel() + r.getCivLevel()))
                 .orElse(regions.get(0));
+    }
+
+
+    public void migrateTo() {
+
     }
 
     public int getLivingVillagerCount() {
@@ -40,15 +45,7 @@ public class GameStateManager {
     public boolean isGameOver() {
         return getLivingVillagerCount() == 0;
     }
-
-    public void renderVillagers(Graphics g) {
-        for (Village v : villagers) {
-            if (v.isAlive()) {
-                v.render(g);
-            }
-        }
-    }
-
+     */
     public ArrayList<Village> getVillagers() {
         return villagers;
     }

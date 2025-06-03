@@ -80,7 +80,7 @@ public class GamePanel extends JPanel implements MouseListener {
 
         satisfactionBar = new JProgressBar(0, 100);
         satisfactionBar.setBounds(600, 30, 300, 20);
-        satisfactionBar.setValue(gameState.getAverageHappiness());
+        //satisfactionBar.setValue(gameState.getAverageHappiness());
         satisfactionBar.setStringPainted(true);
         add(satisfactionBar);
     }
@@ -104,6 +104,16 @@ public class GamePanel extends JPanel implements MouseListener {
         currentVillagerRequest = messages[new Random().nextInt(messages.length)];
     }
 
+    /*
+    public void renderVillagers(Graphics g) {
+        for (Village v : ) {
+            if (v.isAlive()) {
+                v.render(g);
+            }
+        }
+    }
+     */
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -121,17 +131,18 @@ public class GamePanel extends JPanel implements MouseListener {
         for (Region r : regions) {
             if (r.containsPoint(e.getX(), e.getY())) {
                 r.applyWeather(seasonManager);
-                gameState.updateVillagers(regions);
+                //gameState.updateVillagers(regions);
                 updateVillagerRequest();
-                satisfactionBar.setValue(gameState.getAverageHappiness());
+                //satisfactionBar.setValue(gameState.getAverageHappiness());
                 seasonManager.nextTurn();
                 repaint();
-
+                /*
                 if (gameState.isGameOver()) {
                     JOptionPane.showMessageDialog(this, "All villagers have perished. Game Over.");
                     System.exit(0);
                 }
                 break;
+                 */
             }
         }
     }

@@ -12,7 +12,6 @@ public class Village {
         int temp = sm.getTemperature();
         int humidity = sm.getHumidity();
         boolean rain = sm.isPrecipitation();
-
         helpedLastTurn = false;
 
         if (rain && humidity > 60 && temp < 80) {

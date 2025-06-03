@@ -1,13 +1,15 @@
+import java.util.ArrayList;
 import java.util.Random;
 
 public class SeasonManager {
     private Season currentSeason;
+    private ArrayList<Season> Seasons;
     private int turn;
-
     private int temperature;
     private int humidity;
     private int windSpeed;
     private boolean precipitation;
+    private int indicator;
 
     private Random rand = new Random();
 
@@ -29,7 +31,17 @@ public class SeasonManager {
         }
         simulateWeather();
     }
-
+    /*
+    public int getNatureGrowthModifier() {
+        Season caseValue = currentSeason;
+        return switch (currentSeason) {
+            case SPRING -> setNatureGrowthModifier(Season.SPRING);
+            case AUTUMN -> setNatureGrowthModifier(Season.AUTUMN);
+            case SUMMER -> setNatureGrowthModifier(Season.SUMMER);
+            case WINTER -> setNatureGrowthModifier(Season.WINTER);
+        };
+    }
+    */
     private void simulateWeather() {
         switch (currentSeason) {
             case SPRING -> {
@@ -58,6 +70,12 @@ public class SeasonManager {
             }
         }
     }
+    /*
+    public int setNatureGrowthModifier(int indicator) {
+        Season s = new Season;
+        ArrayList<Season> Seasons =
+    }
+     */
 
     public void forcePrecipitation(boolean status) {
         precipitation = status;

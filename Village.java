@@ -1,50 +1,47 @@
 public class Village {
-    private int villageAppreciation;
-    private int villagerSatisfaction;
-    private boolean helped;
-    private int concentration;
-    public Village (int villageAppreciation) {
-        this.villageAppreciation = villageAppreciation;
+    private int appreciation;
+    private int population;
+    private boolean helpedLastTurn;
+
+    public Village() {
+        this.appreciation = 50;
+        this.population = 10;  // starting number of villagers
     }
 
-    public int getVillageAppreciation() {
-        return villageAppreciation;
-    }
-
-    public boolean isHelped() {
-        return helped;
-    }
-
-    public int getConcentration() {
-        return concentration;
-    }
-
-    public boolean getVillageAppreciation(SeasonManager sm) {
-        boolean helped = false;
+    public void evaluateWeather(SeasonManager sm) {
         int temp = sm.getTemperature();
         int humidity = sm.getHumidity();
         boolean rain = sm.isPrecipitation();
 
+        helpedLastTurn = false;
+
         if (rain && humidity > 60 && temp < 80) {
-            villageAppreciation += 5;
-            helped = true;
+            appreciation += 5;
+            helpedLastTurn = true;
         } else if (temp > 90 || humidity < 30) {
-            villageAppreciation -= 5;
+            appreciation -= 10;
+            population -= 1;
         } else {
-            villageAppreciation += 1;
+            appreciation += 1;
         }
 
-        villageAppreciation = Math.max(0, Math.min(100, villageAppreciation));
-        return helped;
+        appreciation = Math.max(0, Math.min(100, appreciation));
+        population = Math.max(0, population);
     }
 
-    private void adjustSatisfaction(boolean positive) {
-        if (positive) {
-            villagerSatisfaction += 5;
-        }
-        else {
-            villagerSatisfaction -= 5;
-        }
-        villagerSatisfaction = Math.max(0, Math.min(100, villagerSatisfaction));
+    public boolean isAlive() {
+        return population > 0;
+    }
+
+    public int getAppreciation() {
+        return appreciation;
+    }
+
+    public int getPopulation() {
+        return population;
+    }
+
+    public boolean wasHelped() {
+        return helpedLastTurn;
     }
 }

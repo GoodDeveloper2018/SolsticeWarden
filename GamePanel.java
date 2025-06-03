@@ -1,13 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Random;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-
+import java.io.File;
 
 public class GamePanel extends JPanel implements MouseListener {
 
@@ -17,12 +16,10 @@ public class GamePanel extends JPanel implements MouseListener {
 
     private ArrayList<Region> regions;
     private SeasonManager seasonManager;
-    private int villagerSatisfaction;
+    private GameStateManager gameState;
     private JLabel weatherLabel;
     private JProgressBar satisfactionBar;
     private String currentVillagerRequest = "";
-    private ArrayList<String> villagerCrop;
-    private int growingConcentration;
 
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -33,25 +30,21 @@ public class GamePanel extends JPanel implements MouseListener {
 
         regions = new ArrayList<>();
         seasonManager = new SeasonManager();
-        villagerSatisfaction = 50;
+        gameState = new GameStateManager(10); // 10 initial villagers
 
         initGame();
         initUI();
     }
 
-    public void playSound(String soundName)
-    {
-        try
-        {
+    public void playSound(String soundName) {
+        try {
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(soundName).getAbsoluteFile());
             Clip clip = AudioSystem.getClip();
             clip.open(audioInputStream);
             clip.start();
-        }
-        catch(Exception ex)
-        {
+        } catch (Exception ex) {
             System.out.println("Error with playing sound.");
-            ex.printStackTrace( );
+            ex.printStackTrace();
         }
     }
 
@@ -87,10 +80,9 @@ public class GamePanel extends JPanel implements MouseListener {
 
         satisfactionBar = new JProgressBar(0, 100);
         satisfactionBar.setBounds(600, 30, 300, 20);
-        satisfactionBar.setValue(villagerSatisfaction);
+        satisfactionBar.setValue(gameState.getAverageHappiness());
         satisfactionBar.setStringPainted(true);
         add(satisfactionBar);
-
     }
 
     private void manuallyChangeWeather(String type) {
@@ -129,11 +121,16 @@ public class GamePanel extends JPanel implements MouseListener {
         for (Region r : regions) {
             if (r.containsPoint(e.getX(), e.getY())) {
                 r.applyWeather(seasonManager);
-                r.
-                satisfactionBar.setValue(villagerSatisfaction);
+                gameState.updateVillagers(regions);
                 updateVillagerRequest();
+                satisfactionBar.setValue(gameState.getAverageHappiness());
                 seasonManager.nextTurn();
                 repaint();
+
+                if (gameState.isGameOver()) {
+                    JOptionPane.showMessageDialog(this, "All villagers have perished. Game Over.");
+                    System.exit(0);
+                }
                 break;
             }
         }

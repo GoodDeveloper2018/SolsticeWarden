@@ -1,52 +1,31 @@
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.*;
 
 public class GameStateManager {
-    private ArrayList<Village> villagers;
+    private final ArrayList<Village> villages;
+    private final Random rng = new Random();
 
-    public GameStateManager(int numVillagers) {
-        villagers = new ArrayList<>();
-        for (int i = 0; i < numVillagers; i++) {
-            villagers.add(new Village());
+    public GameStateManager(List<Region> regions,int num){
+        villages = new ArrayList<>();
+        /* pick a central region (avoid edges) */
+        int grid = (int) Math.sqrt(regions.size());
+        int row  = 1 + rng.nextInt(grid-2);
+        int col  = 1 + rng.nextInt(grid-2);
+        Region start = regions.get(row*grid + col);
+
+        for(int i=0;i<num;i++) villages.add(new Village(start));
+    }
+
+    public void nextTurn(SeasonManager sm,List<Region> regions){
+        for(Village v:villages){
+            if(!v.isAlive()) continue;
+            v.evaluateWeather(sm);
+            v.maybeMigrate(regions);
         }
     }
-    /*
-    public void updateVillagers(ArrayList<Region> regions) {
-        for (Village v : villagers) {
-            if (v.isAlive()) {
-                Region best = findBestRegion(regions);
-                v.migrateTo(best);
-            }
-        }
-    }
 
-    private Region findBestRegion(ArrayList<Region> regions) {
-        return regions.stream()
-                .max(Comparator.comparingInt(r -> r.getNatureLevel() + r.getCivLevel()))
-                .orElse(regions.get(0));
-    }
-
-
-    public void migrateTo() {
-
-    }
-
-    public int getLivingVillagerCount() {
-        return (int) villagers.stream().filter(Villager::isAlive).count();
-    }
-
-    public int getAverageHappiness() {
-        return (int) villagers.stream()
-                .filter(Village::isAlive)
-                .mapToInt(Village::getHappiness)
-                .average().orElse(0);
-    }
-
-    public boolean isGameOver() {
-        return getLivingVillagerCount() == 0;
-    }
-     */
-    public ArrayList<Village> getVillagers() {
-        return villagers;
-    }
+    public int living()  { return (int) villages.stream().filter(Village::isAlive).count(); }
+    public int avgApp()  { return (int) villages.stream().filter(Village::isAlive)
+            .mapToInt(Village::getAppreciation).average().orElse(0); }
+    public List<Village> getVillages(){ return villages; }
+    public boolean gameOver(){ return living()==0; }
 }

@@ -1,46 +1,50 @@
+import java.awt.*;
+import java.util.Random;
+
 public class Village {
-    private int appreciation;
-    private int population;
-    private boolean helpedLastTurn;
+    private int appreciation = 50;
+    private int population   = 10;
+    private boolean helped   = false;
+    private Region region;                  // current location
 
-    public Village() {
-        this.appreciation = 50;
-        this.population = 10;  // starting number of villagers
-    }
+    private static final Random RNG = new Random();
 
-    public void evaluateWeather(SeasonManager sm) {
-        int temp = sm.getTemperature();
-        int humidity = sm.getHumidity();
+    public Village(Region start){ this.region = start; }
+
+    /* ----- environment reactions ----- */
+    public void evaluateWeather(SeasonManager sm){
+        int t = sm.getTemperature();
+        int h = sm.getHumidity();
         boolean rain = sm.isPrecipitation();
-        helpedLastTurn = false;
+        helped = false;
 
-        if (rain && humidity > 60 && temp < 80) {
-            appreciation += 5;
-            helpedLastTurn = true;
-        } else if (temp > 90 || humidity < 30) {
-            appreciation -= 10;
-            population -= 1;
-        } else {
-            appreciation += 1;
-        }
+        if(rain && h>60 && t<80){ appreciation+=5; helped=true; }
+        else if(t>90 || h<30){     appreciation-=10; population--; }
+        else appreciation++;
 
-        appreciation = Math.max(0, Math.min(100, appreciation));
-        population = Math.max(0, population);
+        appreciation = Math.max(0,Math.min(100,appreciation));
+        population   = Math.max(0,population);
     }
 
-    public boolean isAlive() {
-        return population > 0;
+    /* ----- simple migration heuristic ----- */
+    public void maybeMigrate(java.util.List<Region> regions){
+        Region best = regions.stream()
+                .max(java.util.Comparator.comparingInt(Region::getNatureLevel))
+                .orElse(region);
+        region = best;
     }
 
-    public int getAppreciation() {
-        return appreciation;
+    /* ----- draw a tiny dot clustered near region centre ----- */
+    public void render(Graphics g){
+        if(!isAlive()) return;
+        int jitter = 6;
+        int cx = region.centerX() + RNG.nextInt(jitter)-jitter/2;
+        int cy = region.centerY() + RNG.nextInt(jitter)-jitter/2;
+        g.setColor(Color.YELLOW);
+        g.fillOval(cx-3, cy-3, 6,6);
     }
 
-    public int getPopulation() {
-        return population;
-    }
-
-    public boolean wasHelped() {
-        return helpedLastTurn;
-    }
+    /* accessors */
+    public boolean isAlive(){ return population>0; }
+    public int  getAppreciation(){ return appreciation; }
 }

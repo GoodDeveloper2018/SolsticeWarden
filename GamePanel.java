@@ -3,152 +3,118 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Random;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import java.io.File;
 
-public class GamePanel extends JPanel implements MouseListener {
-
-    public static final int WIDTH = 1000;
+public class GamePanel extends JPanel
+        implements MouseListener, KeyListener {
+    private final MainFrame root;
+    public static final int WIDTH  = 1000;
     public static final int HEIGHT = 800;
-    private final int GRID_SIZE = 5;
+    private static final int GRID_SIZE = 5;
 
-    private ArrayList<Region> regions;
-    private SeasonManager seasonManager;
-    private GameStateManager gameState;
-    private JLabel weatherLabel;
-    private JProgressBar satisfactionBar;
-    private String currentVillagerRequest = "";
+    private final ArrayList<Region> regions = new ArrayList<>();
+    private final SeasonManager seasonManager = new SeasonManager();
+    private final GameStateManager gameState;
 
-    public GamePanel() {
-        setPreferredSize(new Dimension(WIDTH, HEIGHT));
+    private final JProgressBar   satisfactionBar = new JProgressBar(0,100);
+    private final JLabel         villagerLabel   = new JLabel();
+    private String currentRequest = "";
+
+    /* ------------------------------------------------ */
+    public GamePanel(MainFrame root){
+        this.root = root;
+        setPreferredSize(new Dimension(WIDTH,HEIGHT));
         setLayout(null);
         setBackground(Color.BLACK);
         addMouseListener(this);
+        addKeyListener(this);
         setFocusable(true);
 
-        regions = new ArrayList<>();
-        seasonManager = new SeasonManager();
-        gameState = new GameStateManager(10); // 10 initial villagers
+        buildRegions();
+        gameState = new GameStateManager(regions,30);
 
-        initGame();
-        initUI();
+        buildUI();
+        updateRequest();
     }
 
-    public void playSound(String soundName) {
-        try {
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(soundName).getAbsoluteFile());
-            Clip clip = AudioSystem.getClip();
-            clip.open(audioInputStream);
-            clip.start();
-        } catch (Exception ex) {
-            System.out.println("Error with playing sound.");
-            ex.printStackTrace();
-        }
+    private void buildRegions(){
+        int size = 100;
+        for(int r=0;r<GRID_SIZE;r++)
+            for(int c=0;c<GRID_SIZE;c++)
+                regions.add(new Region(c*size, r*size+50, size,size,
+                        "R"+r+","+c));
     }
 
-    private void initGame() {
-        int cellSize = 100;
-        for (int row = 0; row < GRID_SIZE; row++) {
-            for (int col = 0; col < GRID_SIZE; col++) {
-                regions.add(new Region(col * cellSize, row * cellSize + 50, cellSize, cellSize, "Region " + row + "," + col));
-            }
-        }
-    }
+    private void buildUI(){
+        JButton rain  = makeButton("Call Rain" , 600,100, e->seasonManager.forcePrecipitation(true));
+        JButton sun   = makeButton("Increase Sun",600,140, e->seasonManager.increaseTemperature());
+        JButton wind  = makeButton("Summon Wind",600,180, e->seasonManager.increaseWind());
+        add(rain); add(sun); add(wind);
 
-    private void initUI() {
-        weatherLabel = new JLabel();
-        weatherLabel.setBounds(10, 10, 400, 30);
-        weatherLabel.setForeground(Color.WHITE);
-        add(weatherLabel);
-
-        JButton rainBtn = new JButton("Call Rain");
-        rainBtn.setBounds(600, 100, 120, 30);
-        rainBtn.addActionListener(e -> manuallyChangeWeather("rain"));
-        add(rainBtn);
-
-        JButton sunBtn = new JButton("Increase Sun");
-        sunBtn.setBounds(600, 140, 120, 30);
-        sunBtn.addActionListener(e -> manuallyChangeWeather("sun"));
-        add(sunBtn);
-
-        JButton windBtn = new JButton("Summon Wind");
-        windBtn.setBounds(600, 180, 120, 30);
-        windBtn.addActionListener(e -> manuallyChangeWeather("wind"));
-        add(windBtn);
-
-        satisfactionBar = new JProgressBar(0, 100);
-        satisfactionBar.setBounds(600, 30, 300, 20);
-        //satisfactionBar.setValue(gameState.getAverageHappiness());
+        satisfactionBar.setBounds(600,30,300,20);
         satisfactionBar.setStringPainted(true);
         add(satisfactionBar);
+
+        villagerLabel.setBounds(600,60,300,20);
+        villagerLabel.setForeground(Color.WHITE);
+        add(villagerLabel);
+    }
+    private JButton makeButton(String txt,int x,int y,ActionListener al){
+        JButton b=new JButton(txt); b.setBounds(x,y,120,30); b.addActionListener(al); return b;
     }
 
-    private void manuallyChangeWeather(String type) {
-        switch (type) {
-            case "rain" -> seasonManager.forcePrecipitation(true);
-            case "sun" -> seasonManager.increaseTemperature();
-            case "wind" -> seasonManager.increaseWind();
-        }
-        repaint();
-    }
-
-    private void updateVillagerRequest() {
-        String[] messages = {
+    /* ----------------------- game loop helpers -------------------- */
+    private void updateRequest(){
+        String[] msgs={
                 "We pray for rain to nourish the fields.",
                 "The heat scorches our homes — shield us.",
                 "Let the winds carry seeds to our lands.",
                 "Balance is all we ask, Warden."
         };
-        currentVillagerRequest = messages[new Random().nextInt(messages.length)];
+        currentRequest = msgs[new Random().nextInt(msgs.length)];
     }
 
-    /*
-    public void renderVillagers(Graphics g) {
-        for (Village v : ) {
-            if (v.isAlive()) {
-                v.render(g);
-            }
+    private void advanceTurn(){
+        seasonManager.nextTurn();
+        gameState.nextTurn(seasonManager,regions);
+        satisfactionBar.setValue(gameState.avgApp());
+        villagerLabel.setText("Villagers alive: "+gameState.living());
+        updateRequest();
+        repaint();
+
+        if(gameState.gameOver()){
+            JOptionPane.showMessageDialog(this,"All villagers have perished.");
+            root.showMenu();
         }
     }
-     */
 
-    @Override
-    protected void paintComponent(Graphics g) {
+    /* ----------------------- rendering ---------------------------- */
+    private void drawVillagers(Graphics g){
+        for(Village v: gameState.getVillages()) v.render(g);
+    }
+
+    @Override protected void paintComponent(Graphics g){
         super.paintComponent(g);
-        for (Region r : regions) {
-            r.render(g);
-        }
+        for(Region r:regions) r.render(g);
+        drawVillagers(g);
 
         g.setColor(Color.WHITE);
-        g.drawString("Season: " + seasonManager.getCurrentSeason() + " | Turn: " + seasonManager.getTurn(), 10, 720);
-        g.drawString("Current Villager Request: " + currentVillagerRequest, 10, 740);
+        g.drawString("Season: "+seasonManager.getCurrentSeason()
+                +" | Turn: "+seasonManager.getTurn(), 10,720);
+        g.drawString("Current Villager Request: "+currentRequest,10,740);
     }
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        for (Region r : regions) {
-            if (r.containsPoint(e.getX(), e.getY())) {
-                r.applyWeather(seasonManager);
-                //gameState.updateVillagers(regions);
-                updateVillagerRequest();
-                //satisfactionBar.setValue(gameState.getAverageHappiness());
-                seasonManager.nextTurn();
-                repaint();
-                /*
-                if (gameState.isGameOver()) {
-                    JOptionPane.showMessageDialog(this, "All villagers have perished. Game Over.");
-                    System.exit(0);
-                }
-                break;
-                 */
-            }
-        }
+    /* ----------------------- input ------------------------------- */
+    @Override public void mouseClicked(MouseEvent e){
+        regions.stream().filter(r->r.containsPoint(e.getX(),e.getY()))
+                .findFirst().ifPresent(r->{
+                    r.applyWeather(seasonManager);
+                    advanceTurn();
+                });
     }
-
-    @Override public void mousePressed(MouseEvent e) {}
-    @Override public void mouseReleased(MouseEvent e) {}
-    @Override public void mouseEntered(MouseEvent e) {}
-    @Override public void mouseExited(MouseEvent e) {}
+    @Override public void keyPressed(KeyEvent e){
+        if(e.getKeyCode()==KeyEvent.VK_M) root.showMenu();
+    }
+    @Override public void keyReleased(KeyEvent e){} @Override public void keyTyped(KeyEvent e){}
+    @Override public void mousePressed(MouseEvent e){} @Override public void mouseReleased(MouseEvent e){}
+    @Override public void mouseEntered(MouseEvent e){} @Override public void mouseExited(MouseEvent e){}
 }

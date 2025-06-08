@@ -1,57 +1,52 @@
 import java.awt.*;
 
 public class Region extends GameObject {
-    private String type;
-    private int natureLevel;
-    private int civLevel;
-    private boolean coldSeason;
+    private final String name;
+    private int natureLevel;  // 0–100
+    private int civLevel;     // 0–100
 
-    public Region(int x, int y, int width, int height, String type) {
-        super(x, y, width, height);
-        this.type = type;
+    public Region(int x, int y, int w, int h, String name) {
+        super(x, y, w, h);
+        this.name        = name;
         this.natureLevel = 50;
-        this.civLevel = 20;
+        this.civLevel    = 20;
     }
 
+    /* helpers for villagers */
+    public int getNatureLevel()    { return natureLevel; }
+    public int getCivLevel()       { return civLevel;    }
+    public int centerX()           { return x + width/2; }
+    public int centerY()           { return y + height/2;}
+
+    /* weather → environment */
     public void applyWeather(SeasonManager sm) {
-        int temp = sm.getTemperature();
-        int humidity = sm.getHumidity();
-        int wind = sm.getWindSpeed();
+        int t  = sm.getTemperature();
+        int h  = sm.getHumidity();
+        int w  = sm.getWindSpeed();
         boolean rain = sm.isPrecipitation();
 
-        if (rain && temp > 50 && temp < 80) {
-            natureLevel += 10;
-        } else if (temp > 85) {
-            natureLevel -= 5;
-        }
+        if (rain && t>50 && t<80) natureLevel += 10;
+        else if (t>85)            natureLevel -= 5;
 
-        if (wind > 20) {
-            civLevel -= 5;
-        } else {
-            civLevel += 2;
-        }
+        civLevel += (w>20) ? -5 : 2;
 
-        natureLevel = Math.max(0, Math.min(100, natureLevel));
-        civLevel = Math.max(0, Math.min(100, civLevel));
+        natureLevel = Math.max(0, Math.min(100,natureLevel));
+        civLevel    = Math.max(0, Math.min(100,civLevel));
     }
 
-    @Override
-    public void render(Graphics g) {
-        int green = Math.min(255, natureLevel * 2);
-        g.setColor(new Color(0, green, 0));
-        g.fillRect(x, y, width, height);
+    @Override public void render(Graphics g) {
+        int green = Math.min(255, natureLevel*2);
+        g.setColor(new Color(0,green,0));
+        g.fillRect(x,y,width,height);
+
         g.setColor(Color.BLACK);
-        g.drawRect(x, y, width, height);
-        g.drawString("N:" + natureLevel, x + 5, y + 15);
-        g.drawString("C:" + civLevel, x + 5, y + 30);
+        g.drawRect(x,y,width,height);
+        g.drawString("N:"+natureLevel, x+4, y+14);
+        g.drawString("C:"+civLevel   , x+4, y+28);
     }
+    @Override public void update() {}
 
-    @Override
-    public void update() {
-
-    }
-
-    public boolean containsPoint(int mx, int my) {
-        return (mx >= x && mx <= x + width && my >= y && my <= y + height);
+    public boolean containsPoint(int mx,int my){
+        return mx>=x && mx<=x+width && my>=y && my<=y+height;
     }
 }

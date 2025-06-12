@@ -25,16 +25,12 @@ public class Village {
         appreciation = Math.max(0,Math.min(100,appreciation));
         population   = Math.max(0,population);
     }
-
-    /* ----- simple migration heuristic ----- */
     public void maybeMigrate(java.util.List<Region> regions){
         Region best = regions.stream()
                 .max(java.util.Comparator.comparingInt(Region::getNatureLevel))
                 .orElse(region);
         region = best;
     }
-
-    /* ----- draw a tiny dot clustered near region centre ----- */
     public void render(Graphics g){
         if(!isAlive()) return;
         int jitter = 6;

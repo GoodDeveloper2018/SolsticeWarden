@@ -1,0 +1,13 @@
+{
+  "world": {
+    "currentLevel": "level1",
+    "visitedAreas": [
+      "village",
+      "forest"
+    ]
+  },
+  "gameMetadata": {
+    "saveTimestamp": "2025-06-12T10:35:00Z",
+    "gameVersion": "1.0.0"
+  }
+}

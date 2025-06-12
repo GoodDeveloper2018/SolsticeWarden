@@ -8,6 +8,7 @@ public class SeasonManager {
     private int humidity;
     private int windSpeed;
     private boolean precipitation;
+    private boolean m;
 
     private final Random rnd = new Random();
 
@@ -27,6 +28,10 @@ public class SeasonManager {
     /* initial call */
     public SeasonManager() { simulateWeather(); }
 
+    public void invokeSuperWeather(boolean m) {
+
+    }
+
     private void simulateWeather() {
         switch (currentSeason) {
             case SPRING -> { temperature=rnd.nextInt(20)+50; humidity=rnd.nextInt(30)+50;
@@ -44,6 +49,9 @@ public class SeasonManager {
     public void forcePrecipitation(boolean r){ precipitation = r; }
     public void increaseTemperature()        { temperature  += 10; }
     public void increaseWind()               { windSpeed    += 10; }
+    public void invokeChangeTemperature(boolean m) {
+
+    }
 
     /* getters */
     public Season getCurrentSeason(){ return currentSeason; }

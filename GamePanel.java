@@ -19,7 +19,6 @@ public class GamePanel extends JPanel
     private final JLabel         villagerLabel   = new JLabel();
     private String currentRequest = "";
 
-    /* ------------------------------------------------ */
     public GamePanel(MainFrame root){
         this.root = root;
         setPreferredSize(new Dimension(WIDTH,HEIGHT));
@@ -49,6 +48,7 @@ public class GamePanel extends JPanel
         JButton sun   = makeButton("Increase Sun",600,140, e->seasonManager.increaseTemperature());
         JButton wind  = makeButton("Summon Wind",600,180, e->seasonManager.increaseWind());
         add(rain); add(sun); add(wind);
+        JButton tempChange = makeButton("Change Temperature", 600, 220, e -> seasonManager.getTemperature());
 
         satisfactionBar.setBounds(600,30,300,20);
         satisfactionBar.setStringPainted(true);
@@ -62,7 +62,6 @@ public class GamePanel extends JPanel
         JButton b=new JButton(txt); b.setBounds(x,y,120,30); b.addActionListener(al); return b;
     }
 
-    /* ----------------------- game loop helpers -------------------- */
     private void updateRequest(){
         String[] msgs={
                 "We pray for rain to nourish the fields.",
@@ -86,8 +85,6 @@ public class GamePanel extends JPanel
             root.showMenu();
         }
     }
-
-    /* ----------------------- rendering ---------------------------- */
     private void drawVillagers(Graphics g){
         for(Village v: gameState.getVillages()) v.render(g);
     }
@@ -102,8 +99,6 @@ public class GamePanel extends JPanel
                 +" | Turn: "+seasonManager.getTurn(), 10,720);
         g.drawString("Current Villager Request: "+currentRequest,10,740);
     }
-
-    /* ----------------------- input ------------------------------- */
     @Override public void mouseClicked(MouseEvent e){
         regions.stream().filter(r->r.containsPoint(e.getX(),e.getY()))
                 .findFirst().ifPresent(r->{

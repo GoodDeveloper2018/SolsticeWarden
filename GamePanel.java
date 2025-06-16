@@ -10,6 +10,7 @@ public class GamePanel extends JPanel
     public static final int WIDTH  = 1000;
     public static final int HEIGHT = 800;
     private static final int GRID_SIZE = 5;
+    private int pixelSize = 1;
 
     private final ArrayList<Region> regions = new ArrayList<>();
     private final SeasonManager seasonManager = new SeasonManager();
@@ -33,6 +34,10 @@ public class GamePanel extends JPanel
 
         buildUI();
         updateRequest();
+    }
+
+    public void setPixelSize(int v){
+        pixelSize = v; repaint();
     }
 
     private void buildRegions(){

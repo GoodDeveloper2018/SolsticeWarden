@@ -28,8 +28,20 @@ public class SeasonManager {
     /* initial call */
     public SeasonManager() { simulateWeather(); }
 
-    public void invokeSuperWeather(boolean m) {
-
+    public void loadFromSave(SaveData d){
+        this.currentSeason = d.currentSeason;
+        this.turn          = d.turn;
+        this.temperature   = d.temperature;
+        this.humidity      = d.humidity;
+        this.windSpeed     = d.windSpeed;
+        this.precipitation = d.windSpeed>0;  // quick derive
+    }
+    private boolean superUsed = false;
+    public boolean invokeSuperWeather(int temp,int hum,int wind,boolean rain){
+        if(superUsed) return false;
+        temperature = temp; humidity = hum; windSpeed = wind; precipitation = rain;
+        superUsed = true;
+        return true;
     }
 
     private void simulateWeather() {
@@ -49,9 +61,7 @@ public class SeasonManager {
     public void forcePrecipitation(boolean r){ precipitation = r; }
     public void increaseTemperature()        { temperature  += 10; }
     public void increaseWind()               { windSpeed    += 10; }
-    public void invokeChangeTemperature(boolean m) {
-
-    }
+    public boolean isSuperUsed(){ return superUsed; }
 
     /* getters */
     public Season getCurrentSeason(){ return currentSeason; }

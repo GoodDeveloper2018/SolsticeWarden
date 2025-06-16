@@ -24,7 +24,7 @@ public class MainFrame extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
 
-        showMenu();  // start here
+        showMenu();
     }
 
     /* panel control */
